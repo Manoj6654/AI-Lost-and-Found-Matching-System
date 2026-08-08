@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}AI Match Results - Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-cpu-fill text-info me-2"></i>AI Potential Matches</h2>
+            {% if target_item %}
+                <p class="text-muted mb-0">Showing top 5 match candidates for: <strong>"{{ target_item.item_name }}"</strong> ({{ target_item.type | upper }})</p>
+            {% else %}
+                <p class="text-muted mb-0">Neural matching results ordered by highest confidence score</p>
+            {% endif %}
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
+            <span class="text-muted small fw-semibold">Filter Score:</span>
+            <a href="{{ url_for('matches.match_results', item_id=target_item.id if target_item else None, min_score=75.0) }}" class="btn btn-sm btn-outline-info {{ 'active' if min_score == 75.0 }}">≥ 75% High Matches</a>
+            <a href="{{ url_for('matches.match_results', item_id=target_item.id if target_item else None, min_score=40.0) }}" class="btn btn-sm btn-outline-secondary {{ 'active' if min_score == 40.0 }}">All (≥ 40%)</a>
+        </div>
+    </div>
+
+    {% if matches %}
+        <div class="row g-4">
+            {% for match in matches %}
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden">
+                        <!-- Match Header with Score & Tier Badge -->
+                        <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-diagram-3-fill text-info fs-4"></i>
+                                <div>
+                                    <h5 class="fw-bold mb-0">Match Score: {{ match.match_score | round(0) }}%</h5>
+                                    <small class="text-white-50">Calculated via NLP & Multi-Attribute Pipeline</small>
+                                </div>
+                            </div>
+                            <span class="badge {{ match.badge_class }} fs-6 px-3 py-2 rounded-pill fw-bold">
+                                {{ match.badge_label }}
+                            </span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress rounded-0" style="height: 6px;">
+                            <div class="progress-bar {{ match.badge_class }}" role="progressbar" style="width: {{ match.match_score }}%" aria-valuenow="{{ match.match_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <!-- Items Comparison Cards -->
+                        <div class="card-body p-4">
+                            <div class="row g-3 align-items-center mb-3">
+                                <!-- Lost Item -->
+                                <div class="col-6">
+                                    <div class="p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 h-100">
+                                        <span class="badge bg-warning text-dark mb-1">LOST ITEM</span>
+                                        <h6 class="fw-bold mb-1 text-dark">{{ match.lost_item.item_name }}</h6>
+                                        <small class="text-muted d-block mb-1"><i class="bi bi-tag me-1"></i>{{ match.lost_item.category }}</small>
+                                        <small class="text-muted d-block"><i class="bi bi-geo-alt me-1"></i>{{ match.lost_item.location }}</small>
+                                        <small class="text-muted d-block"><i class="bi bi-calendar-event me-1"></i>{{ match.lost_item.date.strftime('%b %d, %Y') }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Found Item -->
+                                <div class="col-6">
+                                    <div class="p-3 bg-success bg-opacity-10 rounded border border-success border-opacity-25 h-100">
+                                        <span class="badge bg-success mb-1">FOUND ITEM</span>
+                                        <h6 class="fw-bold mb-1 text-dark">{{ match.found_item.item_name }}</h6>
+                                        <small class="text-muted d-block mb-1"><i class="bi bi-tag me-1"></i>{{ match.found_item.category }}</small>
+                                        <small class="text-muted d-block"><i class="bi bi-geo-alt me-1"></i>{{ match.found_item.location }}</small>
+                                        <small class="text-muted d-block"><i class="bi bi-calendar-event me-1"></i>{{ match.found_item.date.strftime('%b %d, %Y') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Reasons List -->
+                            <div class="bg-light rounded p-3 mb-3 border">
+                                <h6 class="fw-bold text-secondary mb-2 small text-uppercase"><i class="bi bi-check2-circle text-success me-1"></i>Why AI Thinks They Match:</h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for reason in match.get_reasons_list() %}
+                                        <span class="badge bg-white text-dark border shadow-xs py-1 px-2 mb-1">
+                                            {{ reason }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer Action -->
+                        <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Status: <strong>{{ match.status | upper }}</strong></span>
+                            <a href="{{ url_for('matches.match_detail', match_id=match.id) }}" class="btn btn-sm btn-info text-dark fw-bold px-3 shadow-sm">
+                                View Match & Claim <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <i class="bi bi-cpu fs-1 text-secondary d-block mb-3"></i>
+            <h4>No Matching Records Found</h4>
+            <p class="text-muted">No items met the minimum threshold score of {{ min_score }}%.</p>
+            <a href="{{ url_for('matches.match_results', min_score=40.0) }}" class="btn btn-outline-info btn-sm mt-2">View All Potential Candidates (≥ 40%)</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

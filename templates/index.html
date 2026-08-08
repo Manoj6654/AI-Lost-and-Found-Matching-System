@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI-Based Lost & Found Matching System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Banner -->
+    <div class="hero-banner mb-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <span class="badge bg-info text-dark fw-bold px-3 py-2 rounded-pill mb-3">
+                    <i class="bi bi-cpu-fill me-1"></i> Powered by NLP TF-IDF & OpenCV Vision
+                </span>
+                <h1 class="display-4 fw-bold mb-3">Reconnecting Lost Items with Their Owners via AI</h1>
+                <p class="lead mb-4 text-white-50">
+                    Report what you've lost or found. Our intelligent multi-attribute matching algorithm automatically analyzes descriptions, categories, brands, locations, and images to bring lost items home.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{{ url_for('items.report_lost') }}" class="btn btn-warning btn-lg fw-semibold px-4 shadow">
+                        <i class="bi bi-search me-2"></i> Report Lost Item
+                    </a>
+                    <a href="{{ url_for('items.report_found') }}" class="btn btn-success btn-lg fw-semibold px-4 shadow">
+                        <i class="bi bi-box-seam me-2"></i> Report Found Item
+                    </a>
+                    <a href="{{ url_for('matches.match_results') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-magic me-2"></i> View AI Matches
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Step How It Works Banner -->
+    <div class="mb-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark"><i class="bi bi-diagram-3-fill text-info me-2"></i>How System Recovery Works</h2>
+            <p class="text-muted">A seamless 4-step artificial intelligence recovery process</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-pencil-square fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold">1. Report Details</h5>
+                        <p class="text-muted small mb-0">Submit item description, category, location, date, and optionally upload a photo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-info bg-opacity-10 text-info rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-cpu fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold">2. AI Matches</h5>
+                        <p class="text-muted small mb-0">NLP TF-IDF & image feature vectors compute multi-attribute match scores instantly.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-bell fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold">3. Get Notified</h5>
+                        <p class="text-muted small mb-0">High-confidence matches trigger dashboard alerts and detailed match comparisons.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-shield-check fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold">4. Claim & Recover</h5>
+                        <p class="text-muted small mb-0">Submit verification proof for admin approval and secure owner contact release.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live System Impact Stats -->
+    <div class="bg-white rounded-3 shadow-sm p-4 mb-5 border">
+        <div class="row text-center gy-3">
+            <div class="col-md-4">
+                <h2 class="display-6 fw-bold text-primary mb-0"><i class="bi bi-archive me-2"></i>{{ total_items }}</h2>
+                <p class="text-muted mb-0 fw-medium">Total Items Reported</p>
+            </div>
+            <div class="col-md-4 border-start border-end">
+                <h2 class="display-6 fw-bold text-info mb-0"><i class="bi bi-cpu me-2"></i>{{ total_matches }}</h2>
+                <p class="text-muted mb-0 fw-medium">High Potential AI Matches</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-6 fw-bold text-success mb-0"><i class="bi bi-check-circle me-2"></i>{{ total_resolved }}</h2>
+                <p class="text-muted mb-0 fw-medium">Successfully Resolved Cases</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Lost Items Grid -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-exclamation-circle text-warning me-2"></i>Recent Lost Reports</h3>
+            <a href="{{ url_for('items.search', type='lost') }}" class="btn btn-sm btn-outline-primary">View All Lost Items <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            {% if recent_lost %}
+                {% for item in recent_lost %}
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card item-card shadow-sm h-100">
+                            {% if item.image_path %}
+                                <img src="{{ url_for('static', filename=item.image_path) }}" class="item-img-thumb" alt="{{ item.item_name }}">
+                            {% else %}
+                                <div class="item-img-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-search me-1"></i>LOST</span>
+                                    <span class="badge bg-light text-dark border">{{ item.category }}</span>
+                                </div>
+                                <h5 class="card-title fw-bold mb-1">{{ item.item_name }}</h5>
+                                <p class="card-text text-muted small flex-grow-1">{{ item.description | truncate(90) }}</p>
+                                <div class="border-top pt-2 mt-2 text-muted small d-flex justify-content-between">
+                                    <span><i class="bi bi-geo-alt me-1"></i>{{ item.location }}</span>
+                                    <span><i class="bi bi-calendar-event me-1"></i>{{ item.date.strftime('%b %d, %Y') }}</span>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0 pb-3">
+                                <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center text-muted py-4">No active lost items reported yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Found Items Grid -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-box-seam text-success me-2"></i>Recent Found Reports</h3>
+            <a href="{{ url_for('items.search', type='found') }}" class="btn btn-sm btn-outline-primary">View All Found Items <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            {% if recent_found %}
+                {% for item in recent_found %}
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card item-card shadow-sm h-100">
+                            {% if item.image_path %}
+                                <img src="{{ url_for('static', filename=item.image_path) }}" class="item-img-thumb" alt="{{ item.item_name }}">
+                            {% else %}
+                                <div class="item-img-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-success"><i class="bi bi-check2-circle me-1"></i>FOUND</span>
+                                    <span class="badge bg-light text-dark border">{{ item.category }}</span>
+                                </div>
+                                <h5 class="card-title fw-bold mb-1">{{ item.item_name }}</h5>
+                                <p class="card-text text-muted small flex-grow-1">{{ item.description | truncate(90) }}</p>
+                                <div class="border-top pt-2 mt-2 text-muted small d-flex justify-content-between">
+                                    <span><i class="bi bi-geo-alt me-1"></i>{{ item.location }}</span>
+                                    <span><i class="bi bi-calendar-event me-1"></i>{{ item.date.strftime('%b %d, %Y') }}</span>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0 pb-3">
+                                <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center text-muted py-4">No active found items reported yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

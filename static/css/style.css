@@ -1,0 +1,100 @@
+/* Custom Theme CSS for AI Lost & Found System */
+
+body {
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glassmorphism Hero Section */
+.hero-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 3.5rem 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.step-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Match Score Tiers & Badges */
+.badge-very-high {
+    background-color: #10b981 !important;
+    color: white !important;
+}
+
+.badge-high {
+    background-color: #06b6d4 !important;
+    color: white !important;
+}
+
+.badge-possible {
+    background-color: #f59e0b !important;
+    color: white !important;
+}
+
+.badge-low {
+    background-color: #64748b !important;
+    color: white !important;
+}
+
+/* Dynamic Item Cards */
+.item-card {
+    border: none;
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.item-img-placeholder {
+    height: 180px;
+    background-color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 2.5rem;
+}
+
+.item-img-thumb {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Side-by-Side Match View */
+.match-comparison-card {
+    border-radius: 1rem;
+    border: 2px solid #e2e8f0;
+}
+
+.reason-check-item {
+    background: #f8fafc;
+    border-left: 4px solid #06b6d4;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Table Hover styling */
+.dropdown-menu-item:hover {
+    background-color: #f1f5f9;
+}

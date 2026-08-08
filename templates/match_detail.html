@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Match Breakdown #{{ match.id }} - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header Banner with Score -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 overflow-hidden">
+                <div class="card-body bg-dark text-white p-4 p-md-5">
+                    <div class="row align-items-center text-center text-md-start">
+                        <div class="col-md-8 mb-3 mb-md-0">
+                            <span class="badge {{ match.badge_class }} fs-6 px-3 py-2 rounded-pill fw-bold mb-2">
+                                {{ match.badge_label }}
+                            </span>
+                            <h2 class="display-6 fw-bold mb-1">Overall Match Confidence: {{ match.match_score | round(1) }}%</h2>
+                            <p class="text-white-50 mb-0">Analyzed using TF-IDF NLP vectorizer, fuzzy attribute scoring, and OpenCV vision histogram algorithm.</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="position-relative d-inline-block">
+                                <svg width="120" height="120" viewBox="0 0 36 36" class="circular-chart text-info">
+                                    <path class="circle-bg" stroke="rgba(255,255,255,0.1)" stroke-width="3.8" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle" stroke="#06b6d4" stroke-dasharray="{{ match.match_score }}, 100" stroke-width="3.8" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="18" y="20.35" class="percentage" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">{{ match.match_score | round(0) }}%</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reasons Checklist Box -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-lightbulb-fill text-warning me-2"></i>AI Recommendation Factors & Explanations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for reason in reasons %}
+                            <div class="col-md-6">
+                                <div class="reason-check-item">
+                                    <i class="bi bi-check-circle-fill text-info me-2"></i>{{ reason }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side-by-Side Items Comparison Grid -->
+            <div class="row g-4 mb-4">
+                <!-- Lost Item Column -->
+                <div class="col-md-6">
+                    <div class="card border-warning border-2 shadow-sm rounded-3 h-100">
+                        <div class="card-header bg-warning bg-opacity-10 py-3 border-bottom border-warning border-opacity-25">
+                            <span class="badge bg-warning text-dark fw-bold">REPORTED LOST</span>
+                            <h4 class="fw-bold mt-2 mb-0 text-dark">{{ match.lost_item.item_name }}</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if match.lost_item.image_path %}
+                                <img src="{{ url_for('static', filename=match.lost_item.image_path) }}" class="img-fluid rounded mb-3 border" style="max-height: 220px; width: 100%; object-fit: cover;" alt="Lost item">
+                            {% endif %}
+                            <p class="text-muted small mb-3">{{ match.lost_item.description }}</p>
+                            
+                            <table class="table table-sm table-borderless small mb-0">
+                                <tr>
+                                    <td class="text-muted fw-semibold">Category:</td>
+                                    <td class="fw-bold">{{ match.lost_item.category }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Location:</td>
+                                    <td class="fw-bold text-danger"><i class="bi bi-geo-alt me-1"></i>{{ match.lost_item.location }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Date Lost:</td>
+                                    <td class="fw-bold"><i class="bi bi-calendar-event me-1"></i>{{ match.lost_item.date.strftime('%B %d, %Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Color / Brand:</td>
+                                    <td class="fw-bold">{{ match.lost_item.color or 'N/A' }} / {{ match.lost_item.brand or 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Found Item Column -->
+                <div class="col-md-6">
+                    <div class="card border-success border-2 shadow-sm rounded-3 h-100">
+                        <div class="card-header bg-success bg-opacity-10 py-3 border-bottom border-success border-opacity-25">
+                            <span class="badge bg-success fw-bold">REPORTED FOUND</span>
+                            <h4 class="fw-bold mt-2 mb-0 text-dark">{{ match.found_item.item_name }}</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if match.found_item.image_path %}
+                                <img src="{{ url_for('static', filename=match.found_item.image_path) }}" class="img-fluid rounded mb-3 border" style="max-height: 220px; width: 100%; object-fit: cover;" alt="Found item">
+                            {% endif %}
+                            <p class="text-muted small mb-3">{{ match.found_item.description }}</p>
+                            
+                            <table class="table table-sm table-borderless small mb-0">
+                                <tr>
+                                    <td class="text-muted fw-semibold">Category:</td>
+                                    <td class="fw-bold">{{ match.found_item.category }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Location Found:</td>
+                                    <td class="fw-bold text-success"><i class="bi bi-geo-alt me-1"></i>{{ match.found_item.location }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Date Found:</td>
+                                    <td class="fw-bold"><i class="bi bi-calendar-event me-1"></i>{{ match.found_item.date.strftime('%B %d, %Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Color / Brand:</td>
+                                    <td class="fw-bold">{{ match.found_item.color or 'N/A' }} / {{ match.found_item.brand or 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Claim Submission Section -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-light py-3 border-0">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock text-primary me-2"></i>Item Ownership Claim</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if user_claim %}
+                        <div class="alert alert-info d-flex align-items-center gap-3 mb-0" role="alert">
+                            <i class="bi bi-info-circle-fill fs-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Claim Status: {{ user_claim.status | upper }}</h6>
+                                <p class="mb-0 small">You submitted a claim on {{ user_claim.created_at.strftime('%b %d, %Y at %I:%M %p') }}. Message: "{{ user_claim.message }}"</p>
+                            </div>
+                        </div>
+                    {% elif match.status == 'resolved' %}
+                        <div class="alert alert-success d-flex align-items-center gap-3 mb-0">
+                            <i class="bi bi-check-circle-fill fs-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Match Resolved</h6>
+                                <p class="mb-0 small">This item recovery case has been successfully verified and resolved by system administration.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">If you believe this matched item belongs to you, submit an ownership claim with identifying proof (e.g., receipt, serial number, unique wallpapers or marks). An administrator will review and verify your request.</p>
+                        
+                        <form action="{{ url_for('claims.submit_claim', match_id=match.id) }}" method="POST">
+                            <div class="mb-3">
+                                <label for="message" class="form-label fw-semibold">Ownership Verification Details *</label>
+                                <textarea class="form-control" id="message" name="message" rows="3" placeholder="Provide proof of ownership, serial numbers, wallpapers, receipts, or secret identifying marks..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm">
+                                <i class="bi bi-hand-index-thumb me-2"></i> Submit Ownership Claim
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

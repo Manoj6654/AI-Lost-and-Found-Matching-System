@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Login - AI Lost & Found Matching System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-info bg-opacity-10 text-info rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-box-arrow-in-right fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold">Welcome Back</h3>
+                        <p class="text-muted small">Log in to report lost/found items and track AI matches</p>
+                    </div>
+
+                    <form action="{{ url_for('auth.login') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" placeholder="name@example.com" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-info text-dark fw-bold w-100 py-2 shadow-sm mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Login to Account
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <p class="small text-muted mb-0">Don't have an account yet? <a href="{{ url_for('auth.register') }}" class="text-primary fw-bold">Register Here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

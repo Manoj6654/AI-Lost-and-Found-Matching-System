@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Claims - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-hand-index-thumb text-danger me-2"></i>Review Item Claims</h2>
+            <p class="text-muted mb-0">Approve or reject ownership verification requests submitted by users</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Back to Admin Dashboard</a>
+    </div>
+
+    {% if claims %}
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Claimant Details</th>
+                                <th>Matched Items Pair</th>
+                                <th>Proof Message</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for claim in claims %}
+                                <tr>
+                                    <td>#{{ claim.id }}</td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ claim.claimant.name }}</div>
+                                        <small class="text-muted d-block">{{ claim.claimant.email }}</small>
+                                        <small class="text-muted d-block">{{ claim.claimant.phone }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="small">
+                                            <span class="text-warning-emphasis fw-bold">Lost:</span> {{ claim.match.lost_item.item_name }} <br>
+                                            <span class="text-success-emphasis fw-bold">Found:</span> {{ claim.match.found_item.item_name }} <br>
+                                            <span class="badge {{ claim.match.badge_class }} mt-1">Score: {{ claim.match.match_score | round(0) }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="p-2 bg-light rounded small text-secondary" style="max-width: 250px;">
+                                            "{{ claim.message }}"
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if claim.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark fs-6">PENDING</span>
+                                        {% elif claim.status == 'approved' %}
+                                            <span class="badge bg-success fs-6">APPROVED</span>
+                                        {% else %}
+                                            <span class="badge bg-danger fs-6">REJECTED</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if claim.status == 'pending' %}
+                                            <div class="d-flex flex-column gap-1">
+                                                <form action="{{ url_for('admin.approve_claim', claim_id=claim.id) }}" method="POST">
+                                                    <button type="submit" class="btn btn-sm btn-success fw-bold w-100"><i class="bi bi-check-lg me-1"></i> Approve</button>
+                                                </form>
+                                                <form action="{{ url_for('admin.reject_claim', claim_id=claim.id) }}" method="POST">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-x-lg me-1"></i> Reject</button>
+                                                </form>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small">Processed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <i class="bi bi-inbox fs-1 text-secondary d-block mb-3"></i>
+            <h4>No Claims to Review</h4>
+            <p class="text-muted">No item ownership claims have been submitted yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AI Lost & Found Matching System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-info me-2"></i>User Dashboard</h2>
+            <p class="text-muted mb-0">Welcome back, <strong>{{ user.name }}</strong> ({{ user.email }})</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="{{ url_for('items.report_lost') }}" class="btn btn-warning fw-semibold btn-sm px-3 shadow-sm">
+                <i class="bi bi-search me-1"></i> Report Lost
+            </a>
+            <a href="{{ url_for('items.report_found') }}" class="btn btn-success fw-semibold btn-sm px-3 shadow-sm">
+                <i class="bi bi-box-seam me-1"></i> Report Found
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards Grid -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm bg-warning bg-opacity-10 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-warning-emphasis fw-bold">My Lost Reports</span>
+                        <i class="bi bi-search fs-3 text-warning"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0 text-dark">{{ my_lost_count }}</h2>
+                    <small class="text-muted">Reported lost items</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm bg-success bg-opacity-10 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-success-emphasis fw-bold">My Found Reports</span>
+                        <i class="bi bi-box-seam fs-3 text-success"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0 text-dark">{{ my_found_count }}</h2>
+                    <small class="text-muted">Reported found items</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm bg-info bg-opacity-10 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-info-emphasis fw-bold">Possible AI Matches</span>
+                        <i class="bi bi-magic fs-3 text-info"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0 text-dark">{{ possible_matches_count }}</h2>
+                    <small class="text-muted">Score ≥ 50% candidates</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm bg-secondary bg-opacity-10 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary-emphasis fw-bold">Resolved Cases</span>
+                        <i class="bi bi-check-circle fs-3 text-secondary"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0 text-dark">{{ resolved_count }}</h2>
+                    <small class="text-muted">Items successfully recovered</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section: AI Matches & Recent Reports -->
+    <div class="row g-4 mb-5">
+        <!-- Top AI Matches Section -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-magic text-info me-2"></i>High Potential AI Matches</h5>
+                    <a href="{{ url_for('matches.match_results') }}" class="btn btn-sm btn-outline-info">View All Matches</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if possible_matches %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Lost Item</th>
+                                        <th>Found Item</th>
+                                        <th>AI Score</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for match in possible_matches %}
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold text-dark">{{ match.lost_item.item_name }}</div>
+                                                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ match.lost_item.location }}</small>
+                                            </td>
+                                            <td>
+                                                <div class="fw-semibold text-dark">{{ match.found_item.item_name }}</div>
+                                                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ match.found_item.location }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ match.badge_class }} px-2 py-1 fs-6">
+                                                    {{ match.match_score | round(0) }}%
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('matches.match_detail', match_id=match.id) }}" class="btn btn-sm btn-info text-dark fw-bold">
+                                                    View Match
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-cpu fs-1 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0">No active AI matches found for your reported items yet.</p>
+                            <small>Submit lost or found reports to initiate instant neural comparisons.</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Submitted Reports -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>My Recent Reports</h5>
+                    <a href="{{ url_for('user.my_reports') }}" class="btn btn-sm btn-outline-primary">Manage Reports</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_reports %}
+                        <ul class="list-group list-group-flush">
+                            {% for item in recent_reports %}
+                                <li class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            {% if item.type == 'lost' %}
+                                                <span class="badge bg-warning text-dark">LOST</span>
+                                            {% else %}
+                                                <span class="badge bg-success">FOUND</span>
+                                            {% endif %}
+                                            <span class="fw-bold text-dark">{{ item.item_name }}</span>
+                                        </div>
+                                        <small class="text-muted d-block"><i class="bi bi-tag me-1"></i>{{ item.category }} • {{ item.date.strftime('%b %d, %Y') }}</small>
+                                    </div>
+                                    <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-light border">
+                                        Details
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0">You haven't reported any items yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Search & Filter Items - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+        <h3 class="fw-bold mb-3"><i class="bi bi-search text-info me-2"></i>Search & Filter Reports</h3>
+        
+        <form action="{{ url_for('items.search') }}" method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="q" class="form-label fw-semibold">Keywords</label>
+                <input type="text" class="form-control" id="q" name="q" value="{{ query }}" placeholder="Search by name, description, brand, location...">
+            </div>
+
+            <div class="col-md-3">
+                <label for="category" class="form-label fw-semibold">Category</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 col-6">
+                <label for="type" class="form-label fw-semibold">Report Type</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="">All Types</option>
+                    <option value="lost" {% if item_type == 'lost' %}selected{% endif %}>Lost Items</option>
+                    <option value="found" {% if item_type == 'found' %}selected{% endif %}>Found Items</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 col-6">
+                <label for="status" class="form-label fw-semibold">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="resolved" {% if status == 'resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-info text-dark fw-bold w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results Grid -->
+    {% if items %}
+        <div class="row g-4">
+            {% for item in items %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="card item-card shadow-sm h-100 border">
+                        {% if item.image_path %}
+                            <img src="{{ url_for('static', filename=item.image_path) }}" class="item-img-thumb" alt="{{ item.item_name }}">
+                        {% else %}
+                            <div class="item-img-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                {% if item.type == 'lost' %}
+                                    <span class="badge bg-warning text-dark">LOST</span>
+                                {% else %}
+                                    <span class="badge bg-success">FOUND</span>
+                                {% endif %}
+                                <span class="badge bg-light text-dark border">{{ item.category }}</span>
+                            </div>
+                            <h5 class="fw-bold mb-1">{{ item.item_name }}</h5>
+                            <p class="text-muted small mb-2">{{ item.description | truncate(90) }}</p>
+                            <div class="text-muted small">
+                                <div><i class="bi bi-geo-alt text-danger me-1"></i>{{ item.location }}</div>
+                                <div><i class="bi bi-calendar-event text-primary me-1"></i>{{ item.date.strftime('%b %d, %Y') }}</div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 pt-0 pb-3">
+                            <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-secondary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <i class="bi bi-search-heart fs-1 text-secondary d-block mb-3"></i>
+            <h4>No Results Match Your Search Criteria</h4>
+            <p class="text-muted">Try adjusting your keyword filter or clearing category selections.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

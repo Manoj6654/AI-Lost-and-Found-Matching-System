@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}My Reports - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-journal-text text-success me-2"></i>My Reported Items</h2>
+            <p class="text-muted mb-0">Manage items you have reported as lost or found</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('items.report_lost') }}" class="btn btn-sm btn-warning text-dark fw-semibold">
+                <i class="bi bi-plus-circle me-1"></i> Report Lost
+            </a>
+            <a href="{{ url_for('items.report_found') }}" class="btn btn-sm btn-success fw-semibold">
+                <i class="bi bi-plus-circle me-1"></i> Report Found
+            </a>
+        </div>
+    </div>
+
+    {% if items %}
+        <div class="row g-4">
+            {% for item in items %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card item-card shadow-sm h-100 border">
+                        {% if item.image_path %}
+                            <img src="{{ url_for('static', filename=item.image_path) }}" class="item-img-thumb" alt="{{ item.item_name }}">
+                        {% else %}
+                            <div class="item-img-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                {% if item.type == 'lost' %}
+                                    <span class="badge bg-warning text-dark">LOST</span>
+                                {% else %}
+                                    <span class="badge bg-success">FOUND</span>
+                                {% endif %}
+
+                                {% if item.status == 'resolved' %}
+                                    <span class="badge bg-secondary">RESOLVED</span>
+                                {% elif item.status == 'claimed' %}
+                                    <span class="badge bg-info text-dark">CLAIM PENDING</span>
+                                {% else %}
+                                    <span class="badge bg-primary">ACTIVE</span>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="fw-bold mb-1">{{ item.item_name }}</h5>
+                            <span class="badge bg-light text-dark border mb-2">{{ item.category }}</span>
+                            <p class="text-muted small mb-3">{{ item.description | truncate(100) }}</p>
+
+                            <div class="bg-light rounded p-2 small text-muted mb-3">
+                                <div><i class="bi bi-geo-alt me-1 text-danger"></i><strong>Location:</strong> {{ item.location }}</div>
+                                <div><i class="bi bi-calendar-event me-1 text-primary"></i><strong>Date:</strong> {{ item.date.strftime('%B %d, %Y') }}</div>
+                                {% if item.color %}
+                                    <div><i class="bi bi-palette me-1 text-info"></i><strong>Color:</strong> {{ item.color }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 pt-0 pb-3 d-flex gap-2">
+                            <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-secondary flex-grow-1">
+                                <i class="bi bi-info-circle me-1"></i> Details
+                            </a>
+                            <a href="{{ url_for('matches.match_results', item_id=item.id) }}" class="btn btn-sm btn-info text-dark fw-semibold flex-grow-1">
+                                <i class="bi bi-magic me-1"></i> AI Matches
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <i class="bi bi-journal-x fs-1 text-secondary d-block mb-3"></i>
+            <h4>No Reported Items Found</h4>
+            <p class="text-muted">You haven't posted any lost or found item reports yet.</p>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+                <a href="{{ url_for('items.report_lost') }}" class="btn btn-warning fw-semibold">Report Lost Item</a>
+                <a href="{{ url_for('items.report_found') }}" class="btn btn-success fw-semibold">Report Found Item</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

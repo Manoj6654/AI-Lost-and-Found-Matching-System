@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-shield-lock-fill text-warning me-2"></i>Administrator Control Panel</h2>
+            <p class="text-muted mb-0">System administration, item moderation, and claim approval portal</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.manage_claims') }}" class="btn btn-warning text-dark fw-bold btn-sm shadow-sm">
+                <i class="bi bi-hand-index-thumb me-1"></i> Pending Claims ({{ pending_claims }})
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Metric Cards -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-primary bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-primary mb-1">{{ total_users }}</h3>
+                <small class="text-muted fw-semibold">Total Users</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-warning bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-warning-emphasis mb-1">{{ total_lost }}</h3>
+                <small class="text-muted fw-semibold">Lost Reports</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-success bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-success mb-1">{{ total_found }}</h3>
+                <small class="text-muted fw-semibold">Found Reports</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-info bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-info-emphasis mb-1">{{ total_matches }}</h3>
+                <small class="text-muted fw-semibold">AI Matches</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-danger bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-danger mb-1">{{ pending_claims }}</h3>
+                <small class="text-muted fw-semibold">Pending Claims</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm bg-secondary bg-opacity-10 h-100 text-center p-3">
+                <h3 class="fw-bold text-secondary mb-1">{{ resolved_cases }}</h3>
+                <small class="text-muted fw-semibold">Resolved Cases</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Sub-Navigation links -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                <i class="bi bi-people fs-4 text-primary"></i> <span class="fw-bold">Manage Registered Users</span>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_items') }}" class="btn btn-outline-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                <i class="bi bi-box-seam fs-4 text-warning"></i> <span class="fw-bold">Manage Lost/Found Items</span>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_matches') }}" class="btn btn-outline-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                <i class="bi bi-diagram-3 fs-4 text-info"></i> <span class="fw-bold">Manage AI Matches</span>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_claims') }}" class="btn btn-outline-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                <i class="bi bi-hand-index-thumb fs-4 text-danger"></i> <span class="fw-bold">Manage Claims</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Claims Overview Table -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Claims Pending Review</h5>
+            <a href="{{ url_for('admin.manage_claims') }}" class="btn btn-sm btn-outline-primary">View All Claims</a>
+        </div>
+        <div class="card-body p-0">
+            {% if recent_claims %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Claimant</th>
+                                <th>Matched Item Pair</th>
+                                <th>Proof Message</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for claim in recent_claims %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ claim.claimant.name }}</div>
+                                        <small class="text-muted">{{ claim.claimant.email }}</small>
+                                    </td>
+                                    <td>
+                                        <small class="d-block">Lost: <strong>{{ claim.match.lost_item.item_name }}</strong></small>
+                                        <small class="d-block">Found: <strong>{{ claim.match.found_item.item_name }}</strong></small>
+                                    </td>
+                                    <td>
+                                        <small class="text-secondary">"{{ claim.message | truncate(60) }}"</small>
+                                    </td>
+                                    <td>
+                                        {% if claim.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">PENDING</span>
+                                        {% elif claim.status == 'approved' %}
+                                            <span class="badge bg-success">APPROVED</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">REJECTED</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if claim.status == 'pending' %}
+                                            <form action="{{ url_for('admin.approve_claim', claim_id=claim.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-success fw-bold">Approve</button>
+                                            </form>
+                                            <form action="{{ url_for('admin.reject_claim', claim_id=claim.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted small">Processed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center text-muted py-4">No recent claim submissions to review.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

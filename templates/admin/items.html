@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Items - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-box-seam text-warning me-2"></i>Manage Reported Items</h2>
+            <p class="text-muted mb-0">System-wide lost & found item reports moderation</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.manage_items') }}" class="btn btn-sm btn-outline-secondary {{ 'active' if not current_type }}">All</a>
+            <a href="{{ url_for('admin.manage_items', type='lost') }}" class="btn btn-sm btn-outline-warning {{ 'active' if current_type == 'lost' }}">Lost Only</a>
+            <a href="{{ url_for('admin.manage_items', type='found') }}" class="btn btn-sm btn-outline-success {{ 'active' if current_type == 'found' }}">Found Only</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item ID</th>
+                            <th>Type</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Reporter</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>#{{ item.id }}</td>
+                                <td>
+                                    {% if item.type == 'lost' %}
+                                        <span class="badge bg-warning text-dark">LOST</span>
+                                    {% else %}
+                                        <span class="badge bg-success">FOUND</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold text-dark">{{ item.item_name }}</td>
+                                <td>{{ item.category }}</td>
+                                <td>{{ item.owner.name }}</td>
+                                <td>{{ item.location }}</td>
+                                <td>{{ item.date.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    {% if item.status == 'resolved' %}
+                                        <span class="badge bg-secondary">RESOLVED</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">ACTIVE</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="btn btn-sm btn-light border" title="View"><i class="bi bi-eye"></i></a>
+                                        {% if item.status != 'resolved' %}
+                                            <form action="{{ url_for('admin.resolve_item', item_id=item.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Resolved"><i class="bi bi-check-lg"></i></button>
+                                            </form>
+                                        {% endif %}
+                                        <form action="{{ url_for('admin.delete_item', item_id=item.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this report?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

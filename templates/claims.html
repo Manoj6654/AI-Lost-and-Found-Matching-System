@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}My Claims - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-hand-index-thumb text-primary me-2"></i>My Claims</h2>
+            <p class="text-muted mb-0">Track the status of your submitted item ownership claims</p>
+        </div>
+    </div>
+
+    {% if claims %}
+        <div class="row g-4">
+            {% for claim in claims %}
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                            <h5 class="fw-bold mb-0">Claim #{{ claim.id }}</h5>
+                            {% if claim.status == 'approved' %}
+                                <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>APPROVED</span>
+                            {% elif claim.status == 'rejected' %}
+                                <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-1"></i>REJECTED</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark fs-6"><i class="bi bi-hourglass-split me-1"></i>PENDING REVIEW</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <div class="bg-light rounded p-3 mb-3 border">
+                                <h6 class="fw-bold mb-1">Matched Item Pair:</h6>
+                                <p class="mb-1 text-dark">Lost: <strong>{{ claim.match.lost_item.item_name }}</strong></p>
+                                <p class="mb-0 text-dark">Found: <strong>{{ claim.match.found_item.item_name }}</strong></p>
+                                <small class="text-muted d-block mt-2">Match Confidence Score: <strong>{{ claim.match.match_score | round(0) }}%</strong></small>
+                            </div>
+
+                            <p class="mb-2 text-muted small fw-semibold text-uppercase">Your Verification Proof Message:</p>
+                            <p class="card-text bg-white p-2 border rounded text-secondary small">"{{ claim.message }}"</p>
+
+                            {% if claim.status == 'approved' %}
+                                <div class="alert alert-success mt-3 mb-0 small">
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-1"></i>Claim Approved! Contact Details Released:</h6>
+                                    {% if claim.match.lost_item.user_id == session.get('user_id') %}
+                                        <div><strong>Found Item Reporter:</strong> {{ claim.match.found_item.owner.name }}</div>
+                                        <div><strong>Email:</strong> {{ claim.match.found_item.owner.email }}</div>
+                                        <div><strong>Phone:</strong> {{ claim.match.found_item.owner.phone }}</div>
+                                    {% else %}
+                                        <div><strong>Lost Item Owner:</strong> {{ claim.match.lost_item.owner.name }}</div>
+                                        <div><strong>Email:</strong> {{ claim.match.lost_item.owner.email }}</div>
+                                        <div><strong>Phone:</strong> {{ claim.match.lost_item.owner.phone }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer bg-white border-top py-3 text-muted small d-flex justify-content-between align-items-center">
+                            <span>Submitted: {{ claim.created_at.strftime('%b %d, %Y') }}</span>
+                            <a href="{{ url_for('matches.match_detail', match_id=claim.match_id) }}" class="btn btn-sm btn-outline-info">
+                                View Match Breakdown
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
+            <i class="bi bi-inbox fs-1 text-secondary d-block mb-3"></i>
+            <h4>No Claims Submitted</h4>
+            <p class="text-muted">You haven't submitted any item ownership claims yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

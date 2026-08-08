@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Report Found Item - AI Lost & Found System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-success bg-opacity-10 py-3 border-0">
+                    <h3 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-box-seam text-success me-2"></i>Report a Found Item
+                    </h3>
+                    <p class="text-muted small mb-0 mt-1">Provide details of the item found to enable automated AI match notification to the rightful owner</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ url_for('items.report_found') }}" method="POST" enctype="multipart/form-data">
+                        
+                        <!-- Item Name & Category -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="item_name" class="form-label fw-semibold">Item Name *</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name" value="{{ form.item_name if form else '' }}" placeholder="e.g. Black Samsung Mobile Phone" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold">Category *</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="" disabled selected>Select Item Category</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat }}" {% if form and form.category == cat %}selected{% endif %}>{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Detailed Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe color, condition, markings, case, where it was found..." required>{{ form.description if form else '' }}</textarea>
+                            <div class="form-text">TF-IDF NLP vectorizer parses this description to find high-probability matches.</div>
+                        </div>
+
+                        <!-- Color & Brand -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="color" class="form-label fw-semibold">Color</label>
+                                <input type="text" class="form-control" id="color" name="color" value="{{ form.color if form else '' }}" placeholder="e.g. Black, Silver, Red">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="brand" class="form-label fw-semibold">Brand / Manufacturer</label>
+                                <input type="text" class="form-control" id="brand" name="brand" value="{{ form.brand if form else '' }}" placeholder="e.g. Samsung, Apple, Sony">
+                            </div>
+                        </div>
+
+                        <!-- Location, Date, Time -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="location" class="form-label fw-semibold">Found Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" value="{{ form.location if form else '' }}" placeholder="e.g. Near College Library Entrance" required>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label for="date" class="form-label fw-semibold">Date Found *</label>
+                                <input type="date" class="form-control" id="date" name="date" value="{{ form.date if form else '' }}" required>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label for="time" class="form-label fw-semibold">Time (Optional)</label>
+                                <input type="time" class="form-control" id="time" name="time" value="{{ form.time if form else '' }}">
+                            </div>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label fw-semibold">Upload Photo of Found Item (Optional)</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div class="form-text">Image histograms are processed using OpenCV HSV correlation.</div>
+                            
+                            <!-- Image Preview Container -->
+                            <div id="image-preview-container" class="mt-3 d-none text-center p-2 border rounded bg-light">
+                                <img id="image-preview" src="#" alt="Uploaded Preview" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <!-- Additional Details -->
+                        <div class="mb-4">
+                            <label for="additional_details" class="form-label fw-semibold">Storage Location / Additional Notes</label>
+                            <input type="text" class="form-control" id="additional_details" name="additional_details" value="{{ form.additional_details if form else '' }}" placeholder="e.g. Handed over to Campus Security Desk...">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
+                                <i class="bi bi-cpu-fill me-2"></i> Submit & Trigger AI Engine
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
