@@ -193,6 +193,7 @@ To present the project during a BE AI/ML evaluation, use this pre-configured sce
 8. Go to **Pending Claims**, click **Approve**.
 9. Log back in as `sarah@gmail.com` under **My Claims** to see the approved status and the released contact details for `alex@gmail.com` (`+1-555-0789`).
 
+Author Manoj Kumar KR
 ---
 
 ## 🔮 Future Enhancements
