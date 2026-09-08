@@ -8,13 +8,13 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-ai-lost-found-key-2026'
     
     # Database Configuration
-    INSTANCE_DIR = os.path.join(BASE_DIR, 'instance')
+    INSTANCE_DIR = '/tmp/instance'
     os.makedirs(INSTANCE_DIR, exist_ok=True)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(INSTANCE_DIR, 'database.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # File Uploads Configuration
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+    UPLOAD_FOLDER = '/tmp/uploads'
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload size
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
